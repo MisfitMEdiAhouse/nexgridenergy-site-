@@ -1,648 +1,1058 @@
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  BatteryCharging,
-  Bolt,
-  CalendarCheck,
-  CheckCircle2,
-  ChevronRight,
-  CircleDollarSign,
-  ClipboardCheck,
-  Home,
-  Menu,
-  MessageCircle,
-  PanelTop,
-  ShieldCheck,
-  Sun,
-  X,
-  Zap
-} from "lucide-react";
+import React, { useState } from "react";
 
-const CHAT_URL =
-  "https://chat.nexgridenergy.net/chat?utm_source=nexgrid_site&utm_medium=website&utm_campaign=public_site";
+const AI_CHAT_URL = "https://chat.nexgridenergy.net";
+const LEAD_EMAIL = "pricemedia82@gmail.com";
 
-const FORM_CHAT_URL =
-  "https://chat.nexgridenergy.net/chat?utm_source=nexgrid_site&utm_medium=form&utm_campaign=assessment_request";
+export default function App() {
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    zip: "",
+    hasSolar: "",
+    goal: "",
+    consent: false,
+  });
 
-function Logo() {
+  const [submitted, setSubmitted] = useState(false);
+  const [modal, setModal] = useState(null);
+
+  const update = (key, value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const submitLead = (e) => {
+    e.preventDefault();
+
+    const subject = "NexGrid Energy Backup Power Assessment";
+    const body = `
+New NexGrid Energy lead:
+
+Name: ${form.name}
+Phone: ${form.phone}
+Email: ${form.email}
+ZIP: ${form.zip}
+Has solar: ${form.hasSolar}
+Main goal: ${form.goal}
+SMS consent checked: ${form.consent ? "Yes" : "No"}
+
+Compliance note:
+Submitting this form does not enroll the homeowner in automated SMS unless consent is explicitly captured and confirmed.
+    `.trim();
+
+    localStorage.setItem(
+      "nexgrid_latest_lead",
+      JSON.stringify({ ...form, createdAt: new Date().toISOString() })
+    );
+
+    window.location.href = `mailto:${LEAD_EMAIL}?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+
+    setSubmitted(true);
+  };
+
   return (
-    <a href="#home" className="flex items-center gap-3">
-      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-500 text-white shadow-lg shadow-teal-900/20">
-        <Zap size={25} strokeWidth={2.6} />
-      </div>
-      <div className="leading-tight">
-        <div className="text-xl font-black tracking-tight text-white">
-          Nex<span className="text-teal-300">Grid</span>
-        </div>
-        <div className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
-          Energy
-        </div>
-      </div>
-    </a>
-  );
-}
+    <main className="site">
+      <style>{styles}</style>
 
-function Header() {
-  const [open, setOpen] = useState(false);
+      <header className="nav">
+        <a className="brand" href="#home" aria-label="NexGrid Energy home">
+          <span className="brandIcon">⚡</span>
+          <span>NexGrid Energy</span>
+        </a>
 
-  const links = [
-    ["Backup Power", "#backup-power"],
-    ["How It Works", "#how-it-works"],
-    ["Financing", "#financing"],
-    ["FAQ", "#faq"],
-    ["Privacy", "#privacy"]
-  ];
-
-  return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#071827]/90 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
-        <Logo />
-
-        <nav className="hidden items-center gap-7 lg:flex">
-          {links.map(([label, href]) => (
-            <a
-              key={label}
-              href={href}
-              className="text-sm font-semibold text-slate-300 transition hover:text-white"
-            >
-              {label}
-            </a>
-          ))}
-          <a className="btn-primary" href={CHAT_URL}>
-            Start Assessment
-          </a>
+        <nav className="navLinks">
+          <a href="#solutions">Solutions</a>
+          <a href="#process">Process</a>
+          <a href="#assessment">Assessment</a>
+          <a href="#faq">FAQ</a>
         </nav>
 
-        <button
-          className="rounded-xl border border-white/10 p-2 text-white lg:hidden"
-          onClick={() => setOpen(true)}
-          aria-label="Open navigation"
-        >
-          <Menu />
-        </button>
-      </div>
+        <a className="navButton" href={AI_CHAT_URL}>
+          Talk to AI
+        </a>
+      </header>
 
-      {open && (
-        <div className="fixed inset-0 z-[60] bg-slate-950/90 p-5 backdrop-blur-xl lg:hidden">
-          <div className="mb-8 flex items-center justify-between">
-            <Logo />
-            <button
-              className="rounded-xl border border-white/10 p-2 text-white"
-              onClick={() => setOpen(false)}
-              aria-label="Close navigation"
-            >
-              <X />
-            </button>
+      <section id="home" className="hero">
+        <div className="heroText">
+          <p className="eyebrow">Home backup power · Solar battery pairing · Energy resilience</p>
+          <h1>Battery backup systems for homes that cannot afford to lose power.</h1>
+          <p className="heroCopy">
+            NexGrid Energy helps homeowners evaluate Humless battery and inverter solutions,
+            solar battery pairing, generator alternatives, outage protection, and local energy
+            backup options.
+          </p>
+
+          <div className="heroActions">
+            <a className="primary" href="#assessment">
+              Get My Backup Power Score
+            </a>
+            <a className="secondary" href={AI_CHAT_URL}>
+              Chat With NexGrid AI
+            </a>
           </div>
 
-          <div className="grid gap-3">
-            {links.map(([label, href]) => (
-              <a
-                key={label}
-                href={href}
-                onClick={() => setOpen(false)}
-                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-lg font-bold text-white"
+          <div className="trustStrip">
+            <span>✓ Solar-home friendly</span>
+            <span>✓ Backup power planning</span>
+            <span>✓ No pressure assessment</span>
+          </div>
+        </div>
+
+        <div className="heroCard">
+          <div className="gridPulse">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <h2>Backup Power Readiness</h2>
+          <p>
+            Find out whether your home is better suited for battery backup, solar pairing,
+            generator support, or a staged energy upgrade.
+          </p>
+
+          <div className="scoreBox">
+            <div>
+              <strong>3 minute</strong>
+              <small>AI-assisted assessment</small>
+            </div>
+            <div>
+              <strong>0 spam</strong>
+              <small>No automated outreach without consent</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="solutions" className="section">
+        <div className="sectionHeader">
+          <p className="eyebrow">What NexGrid helps with</p>
+          <h2>Turn outages, rate changes, and solar gaps into a clear backup plan.</h2>
+        </div>
+
+        <div className="cards">
+          <article className="card">
+            <span className="cardIcon">🔋</span>
+            <h3>Battery Backup</h3>
+            <p>
+              Evaluate whole-home or critical-load battery backup options for outages,
+              emergencies, and grid instability.
+            </p>
+          </article>
+
+          <article className="card">
+            <span className="cardIcon">☀️</span>
+            <h3>Solar + Battery Pairing</h3>
+            <p>
+              Homes with solar but no storage may still lose power during outages. NexGrid
+              helps identify the right storage path.
+            </p>
+          </article>
+
+          <article className="card">
+            <span className="cardIcon">🏠</span>
+            <h3>Home Energy Assessment</h3>
+            <p>
+              Review home size, outage risk, electrical panel needs, usage patterns, and
+              backup priorities before quoting equipment.
+            </p>
+          </article>
+
+          <article className="card">
+            <span className="cardIcon">⚙️</span>
+            <h3>Inverter Planning</h3>
+            <p>
+              Match battery and inverter setups to real household needs instead of guessing
+              with generic system sizes.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section className="split">
+        <div>
+          <p className="eyebrow">Why battery backup</p>
+          <h2>Solar panels alone do not always mean backup power.</h2>
+          <p>
+            A lot of homeowners assume solar automatically keeps the house powered during
+            an outage. Many systems shut down unless a proper battery and inverter setup is
+            installed. NexGrid helps homeowners understand what they already have, what is
+            missing, and what upgrade path makes sense.
+          </p>
+        </div>
+
+        <div className="checkList">
+          <p>✓ Protect refrigerators, internet, lights, and critical circuits</p>
+          <p>✓ Reduce dependence on gas generators</p>
+          <p>✓ Improve solar self-use where applicable</p>
+          <p>✓ Plan for outages before the next emergency</p>
+        </div>
+      </section>
+
+      <section id="process" className="section darkSection">
+        <div className="sectionHeader">
+          <p className="eyebrow">Simple process</p>
+          <h2>From quick assessment to install-ready recommendation.</h2>
+        </div>
+
+        <div className="steps">
+          <div className="step">
+            <strong>01</strong>
+            <h3>Run the score</h3>
+            <p>Answer a few basic questions about your home, solar, outages, and backup goals.</p>
+          </div>
+
+          <div className="step">
+            <strong>02</strong>
+            <h3>Review options</h3>
+            <p>Get a clear path for battery backup, solar pairing, inverter needs, or panel upgrades.</p>
+          </div>
+
+          <div className="step">
+            <strong>03</strong>
+            <h3>Book a design call</h3>
+            <p>When the fit is right, schedule a local assessment and system recommendation.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="assessment" className="section assessment">
+        <div className="sectionHeader">
+          <p className="eyebrow">Start here</p>
+          <h2>Get your backup power assessment.</h2>
+          <p>
+            Use the form below or talk to the NexGrid AI assistant. This is a research and
+            assessment request, not automatic SMS enrollment.
+          </p>
+        </div>
+
+        <div className="assessmentGrid">
+          <form className="leadForm" onSubmit={submitLead}>
+            <label>
+              Name
+              <input
+                value={form.name}
+                onChange={(e) => update("name", e.target.value)}
+                placeholder="Your name"
+                required
+              />
+            </label>
+
+            <label>
+              Phone
+              <input
+                value={form.phone}
+                onChange={(e) => update("phone", e.target.value)}
+                placeholder="Best phone number"
+                required
+              />
+            </label>
+
+            <label>
+              Email
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => update("email", e.target.value)}
+                placeholder="Best email"
+              />
+            </label>
+
+            <label>
+              ZIP Code
+              <input
+                value={form.zip}
+                onChange={(e) => update("zip", e.target.value)}
+                placeholder="84401"
+                required
+              />
+            </label>
+
+            <label>
+              Do you already have solar?
+              <select
+                value={form.hasSolar}
+                onChange={(e) => update("hasSolar", e.target.value)}
+                required
               >
-                {label}
-              </a>
-            ))}
-            <a
-              onClick={() => setOpen(false)}
-              className="btn-primary mt-3 text-center"
-              href={CHAT_URL}
-            >
-              Start Free Backup Power Assessment
+                <option value="">Select one</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+                <option value="Not sure">Not sure</option>
+              </select>
+            </label>
+
+            <label>
+              Main goal
+              <select
+                value={form.goal}
+                onChange={(e) => update("goal", e.target.value)}
+                required
+              >
+                <option value="">Select one</option>
+                <option value="Outage protection">Outage protection</option>
+                <option value="Solar battery storage">Solar battery storage</option>
+                <option value="Lower grid dependence">Lower grid dependence</option>
+                <option value="Generator alternative">Generator alternative</option>
+                <option value="Not sure yet">Not sure yet</option>
+              </select>
+            </label>
+
+            <label className="checkbox">
+              <input
+                type="checkbox"
+                checked={form.consent}
+                onChange={(e) => update("consent", e.target.checked)}
+              />
+              <span>
+                I agree NexGrid Energy may contact me about my request. I understand this
+                does not enroll me in automated SMS unless explicit SMS consent is separately
+                confirmed.
+              </span>
+            </label>
+
+            <button className="primary full" type="submit">
+              Request Assessment
+            </button>
+
+            {submitted && (
+              <p className="success">
+                Your request was prepared. If your email app opened, hit send.
+              </p>
+            )}
+          </form>
+
+          <aside className="aiBox">
+            <h3>Want the faster path?</h3>
+            <p>
+              Use the AI assistant to answer homeowner questions, qualify battery fit, and
+              route serious prospects into the NexGrid workflow.
+            </p>
+            <a className="secondary full" href={AI_CHAT_URL}>
+              Open NexGrid AI Chat
             </a>
+            <small>
+              AI chat URL currently points to <strong>chat.nexgridenergy.net</strong>.
+              Connect that subdomain to the NexGrid AI app when ready.
+            </small>
+          </aside>
+        </div>
+      </section>
+
+      <section id="faq" className="section">
+        <div className="sectionHeader">
+          <p className="eyebrow">Questions</p>
+          <h2>Common backup power questions.</h2>
+        </div>
+
+        <div className="faq">
+          <details>
+            <summary>Do solar panels keep my home powered during an outage?</summary>
+            <p>
+              Not always. Many grid-tied solar systems shut down during an outage unless
+              they are paired with the correct battery and inverter setup.
+            </p>
+          </details>
+
+          <details>
+            <summary>Is a battery better than a generator?</summary>
+            <p>
+              It depends on the home. Batteries can be quieter, cleaner, and solar-friendly.
+              Generators may still make sense for some backup strategies.
+            </p>
+          </details>
+
+          <details>
+            <summary>Do I need a full-home backup system?</summary>
+            <p>
+              Not necessarily. Many homeowners start with critical-load backup for essentials
+              like refrigeration, internet, lighting, medical equipment, or key circuits.
+            </p>
+          </details>
+
+          <details>
+            <summary>Will submitting this form enroll me in SMS marketing?</summary>
+            <p>
+              No. Permit records and website form requests are not treated as automated SMS
+              consent. Automated outreach requires explicit consent.
+            </p>
+          </details>
+        </div>
+      </section>
+
+      <footer className="footer">
+        <div>
+          <strong>NexGrid Energy</strong>
+          <p>Home backup power · Battery storage · Solar pairing</p>
+        </div>
+
+        <div className="footerLinks">
+          <button onClick={() => setModal("privacy")}>Privacy Policy</button>
+          <button onClick={() => setModal("terms")}>Terms</button>
+          <a href={AI_CHAT_URL}>AI Chat</a>
+        </div>
+      </footer>
+
+      {modal && (
+        <div className="modalBackdrop" onClick={() => setModal(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modalClose" onClick={() => setModal(null)}>
+              ×
+            </button>
+
+            {modal === "privacy" ? (
+              <>
+                <h2>Privacy Policy</h2>
+                <p>
+                  NexGrid Energy collects information submitted through this website for
+                  assessment, scheduling, and customer service purposes. We do not sell
+                  personal information. Permit data, public records, and assessment requests
+                  are not treated as consent for automated SMS or email marketing.
+                </p>
+                <p>
+                  If SMS contact is offered, consent must be separately and explicitly
+                  captured. You may request removal from future contact at any time.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2>Terms of Use</h2>
+                <p>
+                  This website provides general information about home backup power, battery
+                  storage, solar pairing, and energy assessments. Final recommendations depend
+                  on property conditions, equipment availability, local codes, utility rules,
+                  and installer review.
+                </p>
+                <p>
+                  Submitting an assessment request does not guarantee approval, financing,
+                  installation, or specific savings.
+                </p>
+              </>
+            )}
           </div>
         </div>
       )}
-    </header>
+    </main>
   );
 }
 
-function Hero() {
-  return (
-    <section id="home" className="relative overflow-hidden bg-[#071827]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(20,184,166,0.28),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(34,197,94,0.18),transparent_30%)]" />
-      <div className="relative mx-auto grid max-w-7xl gap-12 px-5 py-20 lg:grid-cols-[1.08fr_0.92fr] lg:px-8 lg:py-28">
-        <div>
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-teal-300/25 bg-teal-300/10 px-4 py-2 text-sm font-bold text-teal-200">
-            <ShieldCheck size={17} />
-            Home backup power assessments
-          </div>
-
-          <h1 className="max-w-4xl text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
-            Backup Power for the Home You Refuse to Leave Vulnerable.
-          </h1>
-
-          <p className="mt-7 max-w-2xl text-xl leading-8 text-slate-300">
-            NexGrid Energy helps homeowners protect against outages, rising
-            utility costs, and grid uncertainty with Humless battery backup
-            systems and smart home energy assessments.
-          </p>
-
-          <div className="mt-9 flex flex-col gap-4 sm:flex-row">
-            <a className="btn-primary justify-center" href={CHAT_URL}>
-              Start Free Backup Power Assessment
-              <ChevronRight size={18} />
-            </a>
-            <a className="btn-secondary justify-center" href="#booking">
-              Book Home Backup Power Assessment
-            </a>
-          </div>
-
-          <div className="mt-10 grid gap-3 sm:grid-cols-2">
-            {[
-              "Home backup battery systems",
-              "Inverter and panel integration",
-              "Solar pairing options",
-              "Financing available",
-              "Local energy assessment"
-            ].map((item) => (
-              <div key={item} className="flex items-center gap-3 text-slate-200">
-                <CheckCircle2 className="text-teal-300" size={20} />
-                <span className="font-semibold">{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="glass-card self-center p-6">
-          <div className="rounded-3xl bg-white p-6 text-slate-950 shadow-2xl">
-            <div className="mb-5 flex items-center gap-3">
-              <div className="rounded-2xl bg-teal-100 p-3 text-teal-700">
-                <BatteryCharging size={28} />
-              </div>
-              <div>
-                <h2 className="text-2xl font-black">Free Backup Power Assessment</h2>
-                <p className="text-sm font-medium text-slate-500">
-                  Find out what your home needs before the next outage.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid gap-3">
-              {[
-                ["Outage risk", "How exposed your home is during grid interruptions."],
-                ["Solar/battery fit", "Whether storage pairs with your solar or future system."],
-                ["Backup priorities", "What loads matter most: fridge, HVAC, medical, internet."],
-                ["Financing path", "Options to make protection more affordable."],
-                ["Install readiness", "Panel, inverter, and permitting considerations."]
-              ].map(([title, body]) => (
-                <div key={title} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="font-black text-slate-900">{title}</div>
-                  <div className="mt-1 text-sm leading-6 text-slate-600">{body}</div>
-                </div>
-              ))}
-            </div>
-
-            <a className="btn-dark mt-6 w-full justify-center" href={CHAT_URL}>
-              Start Assessment
-              <MessageCircle size={18} />
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+const styles = `
+:root {
+  --bg: #071114;
+  --panel: #0e1d22;
+  --panel2: #12282f;
+  --text: #f4fbff;
+  --muted: #a8bac1;
+  --line: rgba(255,255,255,.12);
+  --green: #1dd6a3;
+  --green2: #08a87e;
+  --blue: #59b7ff;
+  --yellow: #ffd166;
+  --shadow: 0 30px 80px rgba(0,0,0,.35);
 }
 
-function ProblemSection() {
-  return (
-    <section className="section bg-slate-50">
-      <div className="container-grid">
-        <div>
-          <p className="eyebrow">The problem</p>
-          <h2 className="section-title text-slate-950">
-            Grid instability is no longer somebody else’s problem.
-          </h2>
-          <p className="section-copy">
-            Outages, peak pricing, and utility uncertainty are pushing homeowners
-            to rethink backup power. A battery system can help keep essential
-            loads running and create a smarter path toward energy independence.
-          </p>
-        </div>
-
-        <div className="grid gap-4">
-          {[
-            ["Power outages", "Protect critical loads when the grid goes down.", Bolt],
-            ["Rising utility costs", "Understand whether storage can improve your energy strategy.", CircleDollarSign],
-            ["Solar pairing", "Store more of your solar energy for when it matters.", Sun]
-          ].map(([title, body, Icon]) => (
-            <div key={title} className="feature-card">
-              <Icon className="text-teal-600" />
-              <div>
-                <h3>{title}</h3>
-                <p>{body}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+* {
+  box-sizing: border-box;
 }
 
-function BackupPower() {
-  return (
-    <section id="backup-power" className="section bg-white">
-      <div className="container-grid">
-        <div className="order-2 lg:order-1">
-          <div className="rounded-[2rem] bg-[#071827] p-6 text-white shadow-2xl">
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-6">
-              <BatteryCharging className="mb-5 text-teal-300" size={44} />
-              <h3 className="text-3xl font-black">Humless Battery Backup Solutions</h3>
-              <p className="mt-4 leading-7 text-slate-300">
-                NexGrid Energy helps homeowners evaluate and install Humless
-                battery backup solutions for essential loads, solar pairing, and
-                resilience planning.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="order-1 lg:order-2">
-          <p className="eyebrow">Backup power</p>
-          <h2 className="section-title text-slate-950">
-            Battery backup designed around the way your home actually runs.
-          </h2>
-          <p className="section-copy">
-            Every home is different. Your backup plan should account for outage
-            history, panel readiness, load priorities, solar compatibility,
-            utility rules, and budget.
-          </p>
-
-          <div className="mt-8 grid gap-3">
-            {[
-              "Essential load backup planning",
-              "Whole-home backup feasibility review",
-              "Inverter and electrical panel considerations",
-              "Solar-ready storage options",
-              "Installation and permit readiness"
-            ].map((item) => (
-              <div key={item} className="flex items-center gap-3">
-                <CheckCircle2 className="text-teal-600" size={20} />
-                <span className="font-bold text-slate-800">{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+html {
+  scroll-behavior: smooth;
 }
 
-function HowItWorks() {
-  const steps = [
-    ["Start the AI assessment", "Answer a few quick questions about your home, outages, solar, and energy goals.", MessageCircle],
-    ["Tell us your concerns", "Prioritize backup loads, budget, and whether your main concern is outages or bills.", ClipboardCheck],
-    ["Review options", "See what kind of battery/inverter path may fit your home.", BatteryCharging],
-    ["Book an assessment", "Schedule a home backup power assessment with a NexGrid specialist.", CalendarCheck],
-    ["Install your system", "Move from assessment to installation planning, permits, and final setup.", Home]
-  ];
-
-  return (
-    <section id="how-it-works" className="section bg-slate-50">
-      <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="max-w-3xl">
-          <p className="eyebrow">How it works</p>
-          <h2 className="section-title text-slate-950">
-            From quick assessment to a clear backup power plan.
-          </h2>
-        </div>
-
-        <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-5">
-          {steps.map(([title, body, Icon], index) => (
-            <div key={title} className="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="mb-5 flex items-center justify-between">
-                <div className="rounded-2xl bg-teal-50 p-3 text-teal-700">
-                  <Icon />
-                </div>
-                <span className="text-sm font-black text-slate-400">0{index + 1}</span>
-              </div>
-              <h3 className="text-lg font-black text-slate-950">{title}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{body}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+body {
+  margin: 0;
+  background: radial-gradient(circle at top left, rgba(29,214,163,.22), transparent 34%),
+              radial-gradient(circle at 80% 10%, rgba(89,183,255,.16), transparent 30%),
+              var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-function Financing() {
-  return (
-    <section id="financing" className="section bg-[#071827] text-white">
-      <div className="container-grid">
-        <div>
-          <p className="eyebrow text-teal-300">Financing</p>
-          <h2 className="section-title text-white">
-            Protect your home without guessing your way through the numbers.
-          </h2>
-          <p className="section-copy text-slate-300">
-            Financing availability and final pricing depend on system design,
-            equipment, home electrical conditions, permits, and lender approval.
-            The assessment helps clarify your options before you commit.
-          </p>
-          <a className="btn-primary mt-8" href={CHAT_URL}>
-            Start Assessment
-            <ChevronRight size={18} />
-          </a>
-        </div>
-
-        <div className="grid gap-4">
-          {[
-            ["Budget alignment", "Understand what system size and backup priorities match your budget."],
-            ["Solar pairing", "Explore how battery backup can complement existing or future solar."],
-            ["Install readiness", "Review panel, inverter, utility, and permitting considerations."]
-          ].map(([title, body]) => (
-            <div key={title} className="rounded-[1.6rem] border border-white/10 bg-white/5 p-6">
-              <h3 className="text-xl font-black">{title}</h3>
-              <p className="mt-2 leading-7 text-slate-300">{body}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
-function SolarPairing() {
-  return (
-    <section className="section bg-white">
-      <div className="container-grid">
-        <div>
-          <p className="eyebrow">Solar pairing</p>
-          <h2 className="section-title text-slate-950">
-            Already have solar? Battery backup may be your missing piece.
-          </h2>
-          <p className="section-copy">
-            Many solar homes still go dark during outages unless the system is
-            designed with storage and the right backup configuration. NexGrid
-            helps identify whether your home is ready for battery pairing.
-          </p>
-        </div>
-
-        <div className="rounded-[2rem] border border-slate-200 bg-slate-50 p-6">
-          <div className="grid gap-4">
-            <div className="feature-card bg-white">
-              <Sun className="text-amber-500" />
-              <div>
-                <h3>Solar installed</h3>
-                <p>Evaluate whether your existing system can support storage.</p>
-              </div>
-            </div>
-            <div className="feature-card bg-white">
-              <PanelTop className="text-teal-600" />
-              <div>
-                <h3>Panel review</h3>
-                <p>Understand electrical readiness before installation.</p>
-              </div>
-            </div>
-            <div className="feature-card bg-white">
-              <BatteryCharging className="text-green-600" />
-              <div>
-                <h3>Battery path</h3>
-                <p>Build toward essential load or whole-home backup.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+button,
+input,
+select {
+  font: inherit;
 }
 
-function FAQ() {
-  const faqs = [
-    ["Does NexGrid manufacture Humless equipment?", "No. NexGrid Energy helps homeowners evaluate and install Humless battery backup solutions. Final equipment recommendations depend on the assessment."],
-    ["Can a battery power my whole home?", "Sometimes. It depends on load priorities, system size, electrical panel configuration, inverter capacity, and budget."],
-    ["Do I need solar to use battery backup?", "Not always. Battery systems may be installed with or without solar depending on your goals and equipment design."],
-    ["Is financing available?", "Financing may be available depending on project scope, eligibility, and lender approval."],
-    ["Will this lower my utility bill?", "Potential savings vary. NexGrid does not guarantee savings. An assessment is required to understand your energy profile."]
-  ];
-
-  return (
-    <section id="faq" className="section bg-slate-50">
-      <div className="mx-auto max-w-4xl px-5 lg:px-8">
-        <p className="eyebrow">FAQ</p>
-        <h2 className="section-title text-slate-950">Questions homeowners ask first.</h2>
-
-        <div className="mt-8 grid gap-4">
-          {faqs.map(([question, answer]) => (
-            <details key={question} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <summary className="cursor-pointer text-lg font-black text-slate-950">
-                {question}
-              </summary>
-              <p className="mt-3 leading-7 text-slate-600">{answer}</p>
-            </details>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+.site {
+  min-height: 100vh;
 }
 
-function Contact() {
-  const [smsConsent, setSmsConsent] = useState(false);
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px clamp(18px, 5vw, 64px);
+  background: rgba(7,17,20,.82);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--line);
+}
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    window.location.href = FORM_CHAT_URL;
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 900;
+  letter-spacing: -.03em;
+  font-size: 1.15rem;
+}
+
+.brandIcon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--green), var(--blue));
+  box-shadow: 0 12px 30px rgba(29,214,163,.25);
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  color: var(--muted);
+  font-size: .95rem;
+}
+
+.navLinks a:hover {
+  color: var(--text);
+}
+
+.navButton,
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  border-radius: 999px;
+  padding: 0 20px;
+  font-weight: 800;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.navButton,
+.primary {
+  color: #04100d;
+  background: linear-gradient(135deg, var(--green), #7fffd8);
+  box-shadow: 0 16px 40px rgba(29,214,163,.25);
+}
+
+.secondary {
+  color: var(--text);
+  background: rgba(255,255,255,.07);
+  border-color: var(--line);
+}
+
+.full {
+  width: 100%;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr);
+  gap: clamp(28px, 5vw, 70px);
+  align-items: center;
+  padding: clamp(54px, 8vw, 110px) clamp(18px, 5vw, 64px);
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: .13em;
+  font-size: .78rem;
+  font-weight: 900;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  max-width: 900px;
+  margin-bottom: 22px;
+  font-size: clamp(2.75rem, 8vw, 6.5rem);
+  line-height: .92;
+  letter-spacing: -.075em;
+}
+
+h2 {
+  font-size: clamp(2rem, 5vw, 4.1rem);
+  line-height: 1;
+  letter-spacing: -.06em;
+  margin-bottom: 18px;
+}
+
+h3 {
+  font-size: 1.25rem;
+  letter-spacing: -.03em;
+  margin-bottom: 10px;
+}
+
+.heroCopy,
+.sectionHeader p,
+.split p,
+.card p,
+.step p,
+.aiBox p,
+.faq p,
+.footer p,
+.modal p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.heroCopy {
+  max-width: 720px;
+  font-size: 1.12rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 30px 0 22px;
+}
+
+.trustStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: #d9fff4;
+  font-size: .9rem;
+}
+
+.trustStrip span {
+  padding: 8px 12px;
+  background: rgba(29,214,163,.1);
+  border: 1px solid rgba(29,214,163,.25);
+  border-radius: 999px;
+}
+
+.heroCard {
+  position: relative;
+  overflow: hidden;
+  min-height: 440px;
+  padding: 32px;
+  border-radius: 32px;
+  background: linear-gradient(145deg, rgba(18,40,47,.95), rgba(9,23,28,.95));
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.heroCard:before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle, rgba(29,214,163,.22), transparent 40%);
+  animation: float 7s ease-in-out infinite alternate;
+}
+
+.heroCard > * {
+  position: relative;
+}
+
+.gridPulse {
+  height: 190px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 20px;
+}
+
+.gridPulse span {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 999px;
+  border: 1px solid rgba(29,214,163,.38);
+  animation: pulse 2.8s ease-out infinite;
+}
+
+.gridPulse span:nth-child(2) {
+  animation-delay: .5s;
+}
+
+.gridPulse span:nth-child(3) {
+  animation-delay: 1s;
+}
+
+.scoreBox {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.scoreBox div {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--line);
+}
+
+.scoreBox strong,
+.scoreBox small {
+  display: block;
+}
+
+.scoreBox small {
+  margin-top: 6px;
+  color: var(--muted);
+}
+
+.section,
+.split {
+  padding: clamp(48px, 7vw, 92px) clamp(18px, 5vw, 64px);
+}
+
+.sectionHeader {
+  max-width: 850px;
+  margin-bottom: 28px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.card,
+.step,
+.leadForm,
+.aiBox,
+.faq details {
+  background: rgba(14,29,34,.86);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: 0 18px 60px rgba(0,0,0,.18);
+}
+
+.card {
+  padding: 24px;
+}
+
+.cardIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 18px;
+  border-radius: 16px;
+  background: rgba(29,214,163,.12);
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, .75fr);
+  gap: 30px;
+  align-items: center;
+  background: rgba(255,255,255,.035);
+  border-block: 1px solid var(--line);
+}
+
+.checkList {
+  display: grid;
+  gap: 12px;
+}
+
+.checkList p {
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(29,214,163,.1);
+  border: 1px solid rgba(29,214,163,.22);
+  color: #ddfff6;
+}
+
+.darkSection {
+  background: linear-gradient(180deg, rgba(8,18,22,.1), rgba(8,18,22,.55));
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.step {
+  padding: 26px;
+}
+
+.step strong {
+  display: inline-block;
+  margin-bottom: 42px;
+  color: var(--yellow);
+  font-size: .9rem;
+}
+
+.assessmentGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.leadForm,
+.aiBox {
+  padding: 24px;
+}
+
+.leadForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  color: #d9e9ee;
+  font-weight: 750;
+  font-size: .92rem;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.075);
+  color: var(--text);
+  border-radius: 14px;
+  min-height: 48px;
+  padding: 0 14px;
+  outline: none;
+}
+
+select option {
+  color: #071114;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 4px rgba(29,214,163,.12);
+}
+
+.checkbox {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--muted);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.checkbox input {
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  min-height: 20px;
+  margin-top: 2px;
+}
+
+.leadForm button,
+.success {
+  grid-column: 1 / -1;
+}
+
+.success {
+  margin: 0;
+  color: var(--green);
+  font-weight: 800;
+}
+
+.aiBox {
+  position: sticky;
+  top: 92px;
+}
+
+.aiBox small {
+  display: block;
+  margin-top: 16px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.faq {
+  display: grid;
+  gap: 12px;
+  max-width: 950px;
+}
+
+.faq details {
+  padding: 20px 22px;
+}
+
+.faq summary {
+  cursor: pointer;
+  font-weight: 850;
+}
+
+.faq p {
+  margin: 14px 0 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 28px clamp(18px, 5vw, 64px);
+  border-top: 1px solid var(--line);
+  background: rgba(0,0,0,.18);
+}
+
+.footer p {
+  margin: 8px 0 0;
+}
+
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.footerLinks button,
+.footerLinks a {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+}
+
+.footerLinks button:hover,
+.footerLinks a:hover {
+  color: var(--text);
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(0,0,0,.72);
+  backdrop-filter: blur(10px);
+}
+
+.modal {
+  position: relative;
+  width: min(680px, 100%);
+  padding: 32px;
+  border-radius: 26px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.modalClose {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1.4rem;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(.65);
+    opacity: .9;
+  }
+  100% {
+    transform: scale(1.85);
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  from {
+    transform: translate(-8%, -5%);
+  }
+  to {
+    transform: translate(8%, 7%);
+  }
+}
+
+@media (max-width: 980px) {
+  .hero,
+  .split,
+  .assessmentGrid {
+    grid-template-columns: 1fr;
   }
 
-  return (
-    <section id="booking" className="section bg-white">
-      <div className="container-grid">
-        <div>
-          <p className="eyebrow">Start here</p>
-          <h2 className="section-title text-slate-950">
-            Start your free backup power assessment.
-          </h2>
-          <p className="section-copy">
-            Tell us what you care about most: outages, rising utility costs,
-            solar battery pairing, whole-home backup, or financing.
-          </p>
-          <div className="mt-8 rounded-[1.5rem] bg-slate-50 p-5 text-sm leading-6 text-slate-600">
-            By submitting a form, you agree to receive automated SMS messages
-            from NexGrid Energy regarding home backup power systems, energy
-            assessments, appointment scheduling, and customer support. Message
-            frequency varies. Message and data rates may apply. Reply STOP to
-            opt out or HELP for help. Consent is not a condition of purchase.
-          </div>
-        </div>
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 
-        <form onSubmit={handleSubmit} className="rounded-[2rem] border border-slate-200 bg-slate-50 p-5 shadow-sm">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <input className="field" placeholder="First name" />
-            <input className="field" placeholder="Last name" />
-            <input className="field" placeholder="Phone" type="tel" />
-            <input className="field" placeholder="Email" type="email" />
-            <input className="field sm:col-span-2" placeholder="ZIP code" />
-            <select className="field sm:col-span-2" defaultValue="">
-              <option value="" disabled>
-                Biggest concern
-              </option>
-              <option>Power outages</option>
-              <option>High utility bills</option>
-              <option>Solar battery pairing</option>
-              <option>Whole-home backup</option>
-              <option>Financing</option>
-            </select>
-          </div>
+  .steps {
+    grid-template-columns: 1fr;
+  }
 
-          <label className="mt-5 flex gap-3 rounded-2xl bg-white p-4 text-sm leading-6 text-slate-700">
-            <input
-              type="checkbox"
-              checked={smsConsent}
-              onChange={(e) => setSmsConsent(e.target.checked)}
-              className="mt-1 h-5 w-5"
-            />
-            <span>
-              I agree to receive automated SMS messages from NexGrid Energy.
-              Message/data rates may apply. Reply STOP to opt out. Consent is
-              not a condition of purchase.
-            </span>
-          </label>
-
-          <button className="btn-dark mt-5 w-full justify-center" type="submit">
-            Continue to AI Assessment
-            <ChevronRight size={18} />
-          </button>
-        </form>
-      </div>
-    </section>
-  );
+  .aiBox {
+    position: static;
+  }
 }
 
-function Privacy() {
-  return (
-    <main className="bg-slate-50">
-      <Header />
-      <LegalPage title="Privacy Policy">
-        <p>
-          NexGrid Energy collects information you provide through forms, chat
-          assessments, scheduling links, and contact requests. This may include
-          your name, phone number, email address, ZIP code, home energy concerns,
-          appointment preferences, and related assessment details.
-        </p>
-        <p>
-          We use this information to respond to inquiries, provide energy
-          assessments, schedule appointments, support customer service, and
-          improve our services.
-        </p>
-        <p>
-          If you provide SMS consent, you may receive automated SMS messages
-          from NexGrid Energy regarding home backup power systems, energy
-          assessments, appointment scheduling, and customer support. Message
-          frequency varies. Message and data rates may apply. Reply STOP to opt
-          out or HELP for help. Consent is not a condition of purchase.
-        </p>
-        <p>
-          We may use service providers such as Base44, Twilio, Calendly, Resend,
-          website hosting providers, analytics providers, and related operations
-          platforms to process information and deliver services.
-        </p>
-        <p>
-          NexGrid Energy does not sell personal information. Public permit
-          records, if used for market research, are not treated as SMS or email
-          consent.
-        </p>
-      </LegalPage>
-      <Footer />
-    </main>
-  );
+@media (max-width: 720px) {
+  .nav {
+    align-items: flex-start;
+  }
+
+  .navLinks {
+    display: none;
+  }
+
+  .hero {
+    padding-top: 44px;
+  }
+
+  .heroCard {
+    min-height: 360px;
+    padding: 24px;
+  }
+
+  .cards,
+  .leadForm {
+    grid-template-columns: 1fr;
+  }
+
+  .scoreBox {
+    grid-template-columns: 1fr;
+  }
+
+  .footer {
+    flex-direction: column;
+  }
+
+  .primary,
+  .secondary,
+  .navButton {
+    min-height: 48px;
+  }
 }
-
-function Terms() {
-  return (
-    <main className="bg-slate-50">
-      <Header />
-      <LegalPage title="Terms of Service">
-        <p>
-          This website provides general information about NexGrid Energy, home
-          backup power, Humless battery backup solutions, solar pairing,
-          financing, and energy assessments.
-        </p>
-        <p>
-          Information on this site is not a final design, savings estimate,
-          utility recommendation, engineering plan, or installation guarantee.
-          Final recommendations require an assessment and may depend on home
-          electrical conditions, equipment availability, permitting, utility
-          rules, and local regulations.
-        </p>
-        <p>
-          NexGrid Energy does not guarantee utility savings, outage prevention,
-          or uninterrupted power. Battery backup performance depends on system
-          design, battery capacity, inverter configuration, load selection, and
-          installation conditions.
-        </p>
-        <p>
-          If you opt in to SMS messages, you may reply STOP to opt out or HELP
-          for help. Consent is not a condition of purchase.
-        </p>
-      </LegalPage>
-      <Footer />
-    </main>
-  );
-}
-
-function LegalPage({ title, children }) {
-  return (
-    <section className="px-5 py-16 lg:px-8">
-      <div className="mx-auto max-w-4xl rounded-[2rem] bg-white p-7 shadow-sm lg:p-10">
-        <h1 className="text-4xl font-black text-slate-950">{title}</h1>
-        <div className="prose-content mt-8">{children}</div>
-      </div>
-    </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="bg-[#071827] px-5 py-12 text-slate-300 lg:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-8 md:flex-row md:items-center md:justify-between">
-        <Logo />
-        <div className="flex flex-wrap gap-5 text-sm font-semibold">
-          <a href="#privacy" className="hover:text-white">Privacy Policy</a>
-          <a href="#terms" className="hover:text-white">Terms of Service</a>
-          <a href={CHAT_URL} className="hover:text-white">Start Assessment</a>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-function HomePage() {
-  return (
-    <main>
-      <Header />
-      <Hero />
-      <ProblemSection />
-      <BackupPower />
-      <HowItWorks />
-      <Financing />
-      <SolarPairing />
-      <FAQ />
-      <Contact />
-      <Footer />
-    </main>
-  );
-}
-
-export default function App() {
-  const [route, setRoute] = useState(window.location.hash || "#home");
-
-  useEffect(() => {
-    const onHash = () => setRoute(window.location.hash || "#home");
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, []);
-
-  const page = useMemo(() => {
-    if (route === "#privacy") return <Privacy />;
-    if (route === "#terms") return <Terms />;
-    return <HomePage />;
-  }, [route]);
-
-  return page;
-}
+`;
